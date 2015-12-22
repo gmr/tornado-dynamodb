@@ -6,11 +6,18 @@ DynamoDB Utilities
 import arrow
 import datetime
 import uuid
+import sys
+
+PYTHON3 = True if sys.version_info > (3, 0, 0) else False
+TEXTCHARS = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
 
 
 def marshall(values):
     """Return the values in a nested dict structure that is required for
     writing the values to DynamoDB.
+
+    :param dict values: The values to marshall
+    :rtype: dict
 
     """
     serialized = {}
@@ -28,9 +35,13 @@ def _marshall_value(value):
     :raises: ValueError
 
     """
-    if isinstance(value, bytes):
+    if PYTHON3 and isinstance(value, bytes):
         return {'B': value}
-    elif isinstance(value, str):
+    elif PYTHON3 and isinstance(value, str):
+        return {'S': value}
+    elif not PYTHON3 and isinstance(value, str):
+        if _is_binary(value):
+            return {'B': value}
         return {'S': value}
     elif isinstance(value, dict):
         return {'M': marshall(value)}
@@ -47,12 +58,18 @@ def _marshall_value(value):
     elif isinstance(value, list):
         return {'L': [_marshall_value(v) for v in value]}
     elif isinstance(value, set):
-        if all([isinstance(v, bytes) for v in value]):
+        if PYTHON3 and all([isinstance(v, bytes) for v in value]):
             return {'BS': sorted(list(value))}
+        elif PYTHON3 and all([isinstance(v, str) for v in value]):
+            return {'SS': sorted(list(value))}
         elif all([isinstance(v, float) for v in value]) or \
                 all([isinstance(v, int) for v in value]):
             return {'NS': sorted([str(v) for v in value])}
-        elif all([isinstance(v, str) for v in value]):
+        elif not PYTHON3 and all([isinstance(v, str) for v in value]) and \
+                all([_is_binary(v) for v in value]):
+            return {'BS': sorted(list(value))}
+        elif not PYTHON3 and all([isinstance(v, str) for v in value]) and \
+                all([_is_binary(v) is False for v in value]):
             return {'SS': sorted(list(value))}
         else:
             raise ValueError('Can not mix types in a set')
@@ -129,3 +146,13 @@ def _maybe_convert(value):
         return uuid.UUID(value)
     except ValueError:
         return value
+
+
+def _is_binary(value):
+    """Check to see if a string contains binary data in Python2
+
+    :param str value: The value to check
+    :rtype: bool
+
+    """
+    return bool(value.translate(None, TEXTCHARS))

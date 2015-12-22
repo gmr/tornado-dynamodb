@@ -35,7 +35,7 @@ class MarshallTests(unittest.TestCase):
             },
             'key4': None,
             'key5': ['one', 'two', 'three', 4, None, True],
-            'key6': {'a', 'b', 'c'},
+            'key6': set(['a', 'b', 'c']),
             'key7': {1, 2, 3, 4},
             'key8': arrow_value,
             'key9': uuid_value,
