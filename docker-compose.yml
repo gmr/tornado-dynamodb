@@ -1,0 +1,6 @@
+%YAML 1.2
+---
+dynamodb:
+  image: aweber/alpine-dynamodb
+  ports:
+   - 8000
