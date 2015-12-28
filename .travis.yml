@@ -9,14 +9,16 @@ python:
   - 3.4
   - 3.5
 before_install:
-  - docker pull aweber/alpine-dynamodb
-  - docker run -d -p 8000:8000 aweber/alpine-dynamodb
+  - docker pull tray/dynamodb-local
+  - docker run -d -p 7777:7777 tray/dynamodb-local -inMemory -port 7777
   - mkdir /home/travis/.aws
   - printf "[default]\nregion=us-east-1\noutput=json\n" > /home/travis/.aws/config
 install:
   - pip install -r requirements.txt --download-cache $HOME/.pip-cache
   - pip install -r test-requirements.txt --download-cache $HOME/.pip-cache
-script: nosetests
+env:
+  DYNAMODB_ENDPOINT: localhost:7777
+script:  nosetests
 after_success:
   - codecov
 deploy:
