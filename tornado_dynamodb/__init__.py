@@ -19,17 +19,20 @@ __version__ = '0.1.0'
 
 LOGGER = logging.getLogger(__name__)
 
+# Response constants
 TABLE_ACTIVE = 'ACTIVE'
 TABLE_CREATING = 'CREATING'
 TABLE_DELETING = 'DELETING'
+TABLE_DISABLED = 'DISABLED'
 TABLE_UPDATING = 'UPDATING'
 
+# Table stream view type constants
 STREAM_VIEW_NEW_IMAGE = 'NEW_IMAGE'
 STREAM_VIEW_OLD_IMAGE = 'OLD_IMAGE'
 STREAM_VIEW_NEW_AND_OLD_IMAGES = 'NEW_AND_OLD_IMAGES'
 STREAM_VIEW_KEYS_ONLY = 'KEYS_ONLY'
-STREAM_VIEW_TYPES = (STREAM_VIEW_NEW_IMAGE, STREAM_VIEW_OLD_IMAGE,
-                     STREAM_VIEW_NEW_AND_OLD_IMAGES, STREAM_VIEW_KEYS_ONLY)
+_STREAM_VIEW_TYPES = (STREAM_VIEW_NEW_IMAGE, STREAM_VIEW_OLD_IMAGE,
+                      STREAM_VIEW_NEW_AND_OLD_IMAGES, STREAM_VIEW_KEYS_ONLY)
 
 
 class DynamoDB(client.AsyncAWSClient):
@@ -42,13 +45,12 @@ class DynamoDB(client.AsyncAWSClient):
     :param str endpoint: Override the base endpoint URL
     :param int max_clients: Max simultaneous requests (Default: ``100``)
 
-    :raises: :py:class:`tornado_dynamodb.exceptions.ConfigNotFound`
-    :raises: :py:class:`tornado_dynamodb.exceptions.ConfigParserError`
-    :raises: :py:class:`tornado_dynamodb.exceptions.NoCredentialsError`
-    :raises: :py:class:`tornado_dynamodb.exceptions.NoProfileError`
+    :raises: :exc:`~tornado_dynamodb.exceptions.ConfigNotFound`
+    :raises: :exc:`~tornado_dynamodb.exceptions.ConfigParserError`
+    :raises: :exc:`~tornado_dynamodb.exceptions.NoCredentialsError`
+    :raises: :exc:`~tornado_dynamodb.exceptions.NoProfileError`
 
     """
-
     def __init__(self, profile=None, region=None, access_key=None,
                  secret_key=None, endpoint=None, max_clients=100):
         """Create a new DynamoDB instance"""
@@ -108,7 +110,7 @@ class DynamoDB(client.AsyncAWSClient):
 
         # Configure streams if enabled, if not, it defaults to false
         if stream_enabled:
-            if stream_view_type not in STREAM_VIEW_TYPES:
+            if stream_view_type not in _STREAM_VIEW_TYPES:
                 raise ValueError('Invalid stream_view_type value: {}'.format(
                     stream_view_type))
             payload['StreamSpecification'] = {

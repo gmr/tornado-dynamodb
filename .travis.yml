@@ -17,7 +17,7 @@ before_install:
 install:
   - pip install -r test-requirements.txt
 env:
-  DYNAMODB_ENDPOINT: localhost:7777
+  DYNAMODB_ENDPOINT: http://localhost:7777
 script:  nosetests
 after_success:
   - codecov
