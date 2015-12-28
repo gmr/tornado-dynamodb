@@ -53,13 +53,13 @@ get_exposed_port() {
 }
 
 build_env_file() {
-  DYNAMODB_PORT=$(get_exposed_port dynamodb 8000)
+  DYNAMODB_PORT=$(get_exposed_port dynamodb 7777)
   (echo "export DOCKER_COMPOSE_PREFIX=${DOCKER_COMPOSE_PREFIX}"
    echo "export DOCKER_TLS_VERIFY=${DOCKER_TLS_VERIFY}"
    echo "export DOCKER_HOST=${DOCKER_HOST}"
    echo "export DOCKER_CERT_PATH=${DOCKER_CERT_PATH}"
    echo "export DOCKER_MACHINE_NAME=${DOCKER_MACHINE_NAME}"
-   echo "export DYNAMODB_URI=http://${DOCKER_IP}:${DYNAMODB_PORT}"
+   echo "export DYNAMODB_ENDPOINT=http://${DOCKER_IP}:${DYNAMODB_PORT}"
   ) > $1
 }
 
