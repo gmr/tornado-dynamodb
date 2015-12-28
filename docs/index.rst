@@ -11,6 +11,7 @@ Contents:
    :maxdepth: 1
 
    api
+   exceptions
    examples
 
 Issues
