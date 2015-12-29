@@ -61,19 +61,34 @@ class DynamoDB(client.AsyncAWSClient):
         self.ioloop = ioloop.IOLoop.current()
 
     def create_table(self, name, attributes, key_schema, read_capacity_units=1,
-                     write_capacity_units=1, local_secondary_indexes=None,
-                     global_secondary_indexes=None, stream_enabled=False,
+                     write_capacity_units=1, global_secondary_indexes=None,
+                     local_secondary_indexes=None, stream_enabled=False,
                      stream_view_type=None):
-        """The CreateTable operation adds a new table to your account. In an
+        """The *CreateTable* operation adds a new table to your account. In an
         AWS account, table names must be unique within each region. That is,
         you can have two tables with same name if you create the tables in
         different regions.
 
-        .. note:: You can optionally define secondary indexes on the new table,
-                  as part of the CreateTable operation. If you want to create
-                  multiple tables with secondary indexes on them, you must
-                  create the tables sequentially. Only one table with secondary
-                  indexes can be in the ``CREATING`` state at any given time.
+        *CreateTable* is an asynchronous operation. Upon receiving a
+        *CreateTable* request, DynamoDB immediately returns a response with a
+        ``TableStatus`` of ``CREATING``. After the table is created, DynamoDB
+        sets the ``TableStatus`` to ``ACTIVE``. You can perform read and write
+        operations only on an ``ACTIVE`` table.
+
+        You can optionally define secondary indexes on the new table, as part
+        of the CreateTable operation. If you want to create multiple tables
+        with secondary indexes on them, you must create the tables
+        sequentially. Only one table with secondary indexes can be in the
+        ``CREATING`` state at any given time.
+
+        For the proper format of ``attributes``, ``key_schema``,
+        ``local_secondary_indexes``, and ``global_secondary_indexes`` please
+        visit `the Amazon documentation for the CreateTable operation
+        <http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/
+        API_CreateTable.html>`_.
+
+        You can use the :meth:`~tornado_dynamodb.DynamoDB.describe_table` API
+        to check the table status.
 
         :param str name: The table name
         :param list attributes: A list of attribute definition key/value pairs
@@ -89,10 +104,15 @@ class DynamoDB(client.AsyncAWSClient):
         :param int write_capacity_units: The maximum number of writes consumed
             per second before DynamoDB returns a
             :exc:`~tornado_dynamodb.exceptions.ThrottlingException`
-        :param local_secondary_indexes:
-        :param global_secondary_indexes:
+        :param list global_secondary_indexes: One or more global secondary
+            indexes (the maximum is five) to be created on the table.
+        :param list local_secondary_indexes: One or more local secondary
+            indexes (the maximum is five) to be created on the table. Each
+            index is scoped to a given partition key value. There is a 10 GB
+            size limit per partition key value; otherwise, the size of a local
+            secondary index is unconstrained.
         :param bool stream_enabled: Indicates whether DynamoDB Streams is
-            enabled (``True``) or disabled (``False``) on the table.
+            enabled (``True``) or disabled (``False``) for the table.
         :param str stream_view_type: When an item in the table is modified,
             StreamViewType determines what information is written to the stream
             for this table.
@@ -118,6 +138,10 @@ class DynamoDB(client.AsyncAWSClient):
                 'StreamEnabled': True,
                 'StreamViewType': stream_view_type
             }
+        if global_secondary_indexes:
+            payload['GlobalSecondaryIndexes'] = global_secondary_indexes
+        if local_secondary_indexes:
+            payload['LocalSecondaryIndexes'] = local_secondary_indexes
 
         future = concurrent.TracebackFuture()
 

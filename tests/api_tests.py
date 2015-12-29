@@ -93,11 +93,56 @@ class AWSClientTests(AsyncTestCase):
 class CreateTableTests(AsyncTestCase):
 
     @testing.gen_test
-    def test_create_table(self):
+    def test_simple_table(self):
         table = str(uuid.uuid4())
         attrs = [{'AttributeName': 'id', 'AttributeType': 'S'}]
         schema = [{'AttributeName': 'id', 'KeyType': 'HASH'}]
         response = yield self.client.create_table(table, attrs, schema)
+        self.assertEqual(response['TableName'], table)
+        self.assertIn(response['TableStatus'],
+                      [tornado_dynamodb.TABLE_ACTIVE,
+                       tornado_dynamodb.TABLE_CREATING])
+
+    @testing.gen_test
+    def test_complex_table(self):
+        table = str(uuid.uuid4())
+        attrs = [{'AttributeName': 'id', 'AttributeType': 'S'},
+                 {'AttributeName': 'legacy', 'AttributeType': 'N'},
+                 {'AttributeName': 'type', 'AttributeType': 'S'}]
+        schema = [{'AttributeName': 'id', 'KeyType': 'HASH'}]
+        gsi = [{'IndexName': str(uuid.uuid4()),
+                'KeySchema': [{'AttributeName': 'legacy', 'KeyType': 'HASH'},
+                              {'AttributeName': 'type', 'KeyType': 'RANGE'}],
+                'Projection': {
+                     'ProjectionType': 'KEYS_ONLY'
+                },
+                'ProvisionedThroughput': {
+                    'ReadCapacityUnits': 10,
+                    'WriteCapacityUnits': 10
+                }}]
+        response = yield self.client.create_table(table, attrs, schema,
+                                                  10, 10, gsi)
+        self.assertEqual(response['TableName'], table)
+        self.assertIn(response['TableStatus'],
+                      [tornado_dynamodb.TABLE_ACTIVE,
+                       tornado_dynamodb.TABLE_CREATING])
+
+    @testing.gen_test
+    def test_table_with_lsi(self):
+        table = str(uuid.uuid4())
+        attrs = [{'AttributeName': 'id', 'AttributeType': 'S'},
+                 {'AttributeName': 'legacy', 'AttributeType': 'N'},
+                 {'AttributeName': 'type', 'AttributeType': 'S'}]
+        schema = [{'AttributeName': 'legacy', 'KeyType': 'HASH'},
+                  {'AttributeName': 'type', 'KeyType': 'RANGE'}]
+        lsi = [{'IndexName': str(uuid.uuid4()),
+                'KeySchema': [{'AttributeName': 'legacy', 'KeyType': 'HASH'},
+                              {'AttributeName': 'id', 'KeyType': 'RANGE'}],
+                'Projection': {
+                     'ProjectionType': 'KEYS_ONLY'
+                }}]
+        response = yield self.client.create_table(table, attrs, schema,
+                                                  10, 10, None, lsi)
         self.assertEqual(response['TableName'], table)
         self.assertIn(response['TableStatus'],
                       [tornado_dynamodb.TABLE_ACTIVE,
