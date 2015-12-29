@@ -511,7 +511,89 @@ class DynamoDB(client.AsyncAWSClient):
         on the table.
 
         :param str name: The table name
-        :rtype: dict
+        :returns: Response Format:
+
+            .. code:: json
+
+                {
+                  "AttributeDefinitions": [{
+                    "AttributeName": "string",
+                    "AttributeType": "string"
+                  }],
+                  "CreationDateTime": number,
+                  "GlobalSecondaryIndexes": [{
+                    "Backfilling": boolean,
+                    "IndexArn": "string",
+                    "IndexName": "string",
+                    "IndexSizeBytes": number,
+                    "IndexStatus": "string",
+                    "ItemCount": number,
+                    "KeySchema": [{
+                      "AttributeName": "string",
+                      "KeyType": "string"
+                    }],
+                    "Projection": {
+                      "NonKeyAttributes": [
+                        "string"
+                      ],
+                      "ProjectionType": "string"
+                    },
+                    "ProvisionedThroughput": {
+                      "LastDecreaseDateTime": number,
+                      "LastIncreaseDateTime": number,
+                      "NumberOfDecreasesToday": number,
+                      "ReadCapacityUnits": number,
+                      "WriteCapacityUnits": number
+                    }
+                  }],
+                  "ItemCount": number,
+                  "KeySchema": [{
+                    "AttributeName": "string",
+                    "KeyType": "string"
+                  }],
+                  "LatestStreamArn": "string",
+                  "LatestStreamLabel": "string",
+                  "LocalSecondaryIndexes": [{
+                    "IndexArn": "string",
+                    "IndexName": "string",
+                    "IndexSizeBytes": number,
+                    "ItemCount": number,
+                    "KeySchema": [{
+                      "AttributeName": "string",
+                      "KeyType": "string"
+                    }],
+                    "Projection": {
+                      "NonKeyAttributes": [
+                        "string"
+                      ],
+                      "ProjectionType": "string"
+                    }
+                  }],
+                  "ProvisionedThroughput": {
+                    "LastDecreaseDateTime": number,
+                    "LastIncreaseDateTime": number,
+                    "NumberOfDecreasesToday": number,
+                    "ReadCapacityUnits": number,
+                    "WriteCapacityUnits": number
+                  },
+                  "StreamSpecification": {
+                    "StreamEnabled": boolean,
+                    "StreamViewType": "string"
+                  },
+                  "TableArn": "string",
+                  "TableName": "string",
+                  "TableSizeBytes": number,
+                  "TableStatus": "string"
+                }
+
+        :raises: :py:exc:`~tornado_dynamodb.exceptions.InternalFailure`
+                 :py:exc:`~tornado_dynamodb.exceptions.MissingParameter`
+                 :py:exc:`~tornado_dynamodb.exceptions.OptInRequired`
+                 :py:exc:`~tornado_dynamodb.exceptions.RequestExpired`
+                 :py:exc:`~tornado_dynamodb.exceptions.ServiceUnavailable`
+                 :py:exc:`~tornado_dynamodb.exceptions.ThrottlingException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ValidationException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ResourceNotFound`
 
         """
         future = concurrent.TracebackFuture()
@@ -541,26 +623,24 @@ class DynamoDB(client.AsyncAWSClient):
 
         :param str table_name: The name of the table containing the requested
             item.
-        :param dict key: A map of attribute names to ``AttributeValue`` objects,
-            representing the primary key of the item to retrieve.
-
-            For the primary key, you must provide all of the attributes. For
+        :param dict key: A map of attribute names to ``AttributeValue``
+            objects, representing the primary key of the item to retrieve. For
+            the primary key, you must provide all of the attributes. For
             example, with a simple primary key, you only need to provide a
             value for the partition key. For a composite primary key, you must
             provide values for both the partition key and the sort key.
         :param bool consistent_read: Determines the read consistency model: If
-            set to ``True``, then the operation uses strongly consistent reads;
-            otherwise, the operation uses eventually consistent reads.
+            set to :py:data`True`, then the operation uses strongly consistent
+            reads; otherwise, the operation uses eventually consistent reads.
         :param dict expression_attribute_names: One or more substitution tokens
             for attribute names in an expression.
         :param str projection_expression: A string that identifies one or more
             attributes to retrieve from the table. These attributes can include
             scalars, sets, or elements of a JSON document. The attributes in
-            the expression must be separated by commas.
-
-            If no attribute names are specified, then all attributes will be
-            returned. If any of the requested attributes are not found, they
-            will not appear in the result.
+            the expression must be separated by commas. If no attribute names
+            are specified, then all attributes will be returned. If any of the
+            requested attributes are not found, they will not appear in the
+            result.
         :param str return_consumed_capacity: Determines the level of detail
             about provisioned throughput consumption that is returned in the
             response:
@@ -575,7 +655,63 @@ class DynamoDB(client.AsyncAWSClient):
                 capacity for the operation.
               - ``NONE``: No consumed capacity details are included in the
                 response.
-        :rtype: dict
+        :returns: Response Format:
+
+            .. code:: json
+
+                {
+                  "ConsumedCapacity": {
+                    "CapacityUnits": number,
+                    "GlobalSecondaryIndexes": {
+                      "string": {
+                        "CapacityUnits": number
+                      }
+                    },
+                    "LocalSecondaryIndexes": {
+                      "string": {
+                        "CapacityUnits": number
+                      }
+                    },
+                    "Table": {
+                      "CapacityUnits": number
+                    },
+                    "TableName": "string"
+                  },
+                  "Item": {
+                    "string": {
+                      "B": blob,
+                      "BOOL": boolean,
+                      "BS": [
+                        blob
+                      ],
+                      "L": [
+                        AttributeValue
+                      ],
+                      "M": {
+                        "string": AttributeValue
+                      },
+                      "N": "string",
+                      "NS": [
+                        "string"
+                      ],
+                      "NULL": boolean,
+                      "S": "string",
+                      "SS": [
+                        "string"
+                      ]
+                    }
+                  }
+                }
+
+        :raises: :py:exc:`~tornado_dynamodb.exceptions.InternalFailure`
+                 :py:exc:`~tornado_dynamodb.exceptions.MissingParameter`
+                 :py:exc:`~tornado_dynamodb.exceptions.OptInRequired`
+                 :py:exc:`~tornado_dynamodb.exceptions.RequestExpired`
+                 :py:exc:`~tornado_dynamodb.exceptions.ServiceUnavailable`
+                 :py:exc:`~tornado_dynamodb.exceptions.ThrottlingException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ValidationException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ResourceNotFound`
+                 :py:exc:`~tornado_dynamodb.exceptions.ProvisionedThroughputExceeded`
 
         """
         pass
