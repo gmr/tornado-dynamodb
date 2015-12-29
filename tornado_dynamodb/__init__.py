@@ -202,16 +202,15 @@ class DynamoDB(client.AsyncAWSClient):
                   "TableStatus": "string"
                 }
 
-        :raises: :py:exc:`~tornado_dynamodb.exceptions.InternalServerError`
-                 :py:exc:`~tornado_dynamodb.exceptions.InternalFailure`
+        :raises: :py:exc:`~tornado_dynamodb.exceptions.InternalFailure`
                  :py:exc:`~tornado_dynamodb.exceptions.LimitExceeded`
                  :py:exc:`~tornado_dynamodb.exceptions.MissingParameter`
                  :py:exc:`~tornado_dynamodb.exceptions.OptInRequired`
                  :py:exc:`~tornado_dynamodb.exceptions.ResourceInUse`
                  :py:exc:`~tornado_dynamodb.exceptions.RequestExpired`
                  :py:exc:`~tornado_dynamodb.exceptions.ServiceUnavailable`
-                 :py:exc:`~tornado_dynamodb.exceptions.Throttling`
-                 :py:exc:`~tornado_dynamodb.exceptions.ValidationError`
+                 :py:exc:`~tornado_dynamodb.exceptions.ThrottlingException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ValidationException`
 
         """
         payload = {
@@ -380,6 +379,17 @@ class DynamoDB(client.AsyncAWSClient):
                   }
                 }
 
+        :raises: :py:exc:`~tornado_dynamodb.exceptions.InternalFailure`
+                 :py:exc:`~tornado_dynamodb.exceptions.MissingParameter`
+                 :py:exc:`~tornado_dynamodb.exceptions.OptInRequired`
+                 :py:exc:`~tornado_dynamodb.exceptions.RequestExpired`
+                 :py:exc:`~tornado_dynamodb.exceptions.ServiceUnavailable`
+                 :py:exc:`~tornado_dynamodb.exceptions.ThrottlingException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ValidationException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ResourceNotFound`
+                 :py:exc:`~tornado_dynamodb.exceptions.ProvisionedThroughputExceeded`
+                 :py:exc:`~tornado_dynamodb.exceptions.ItemCollectionSizeLimitExceeded`
+
         """
         pass
 
@@ -469,6 +479,17 @@ class DynamoDB(client.AsyncAWSClient):
                   "TableSizeBytes": number,
                   "TableStatus": "string"
                 }
+
+        :raises: :py:exc:`~tornado_dynamodb.exceptions.InternalFailure`
+                 :py:exc:`~tornado_dynamodb.exceptions.MissingParameter`
+                 :py:exc:`~tornado_dynamodb.exceptions.OptInRequired`
+                 :py:exc:`~tornado_dynamodb.exceptions.RequestExpired`
+                 :py:exc:`~tornado_dynamodb.exceptions.ServiceUnavailable`
+                 :py:exc:`~tornado_dynamodb.exceptions.ThrottlingException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ValidationException`
+                 :py:exc:`~tornado_dynamodb.exceptions.LimitExceeded`
+                 :py:exc:`~tornado_dynamodb.exceptions.ResourceInUse`
+                 :py:exc:`~tornado_dynamodb.exceptions.ResourceNotFound`
 
         """
         future = concurrent.TracebackFuture()

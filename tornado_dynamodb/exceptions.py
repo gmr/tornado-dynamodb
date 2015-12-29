@@ -42,6 +42,14 @@ class InternalFailure(DynamoDBException):
     pass
 
 
+class ItemCollectionSizeLimitExceeded(DynamoDBException):
+    """An item collection is too large. This exception is only returned for
+    tables that have one or more local secondary indexes.
+
+    """
+    pass
+
+
 class InvalidAction(DynamoDBException):
     """The action or operation requested is invalid. Verify that the action is
     typed correctly.
@@ -62,14 +70,6 @@ class InvalidParameterValue(DynamoDBException):
 
 class InvalidQueryParameter(DynamoDBException):
     """The AWS query string is malformed or does not adhere to AWS standards."""
-    pass
-
-
-class ItemCollectionSizeLimitExceeded(DynamoDBException):
-    """An item collection is too large. This exception is only returned for
-    tables that have one or more local secondary indexes.
-
-    """
     pass
 
 
