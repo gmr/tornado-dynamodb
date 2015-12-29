@@ -118,11 +118,84 @@ class DynamoDB(client.AsyncAWSClient):
             size limit per partition key value; otherwise, the size of a local
             secondary index is unconstrained.
         :param bool stream_enabled: Indicates whether DynamoDB Streams is
-            enabled (``True``) or disabled (``False``) for the table.
+            enabled (:py:data:`True`) or disabled (:py:data:`False`) for the
+            table.
         :param str stream_view_type: When an item in the table is modified,
-            StreamViewType determines what information is written to the stream
-            for this table.
+            ``stream_view_type`` determines what information is written to the
+            stream for this table.
         :rtype: dict
+            .. code:: json
+
+                {
+                  "AttributeDefinitions": [{
+                    "AttributeName": "string",
+                    "AttributeType": "string"
+                  }],
+                  "CreationDateTime": number,
+                  "GlobalSecondaryIndexes": [{
+                    "Backfilling": boolean,
+                    "IndexArn": "string",
+                    "IndexName": "string",
+                    "IndexSizeBytes": number,
+                    "IndexStatus": "string",
+                    "ItemCount": number,
+                    "KeySchema": [{
+                      "AttributeName": "string",
+                      "KeyType": "string"
+                    }],
+                    "Projection": {
+                      "NonKeyAttributes": [
+                        "string"
+                      ],
+                      "ProjectionType": "string"
+                    },
+                    "ProvisionedThroughput": {
+                      "LastDecreaseDateTime": number,
+                      "LastIncreaseDateTime": number,
+                      "NumberOfDecreasesToday": number,
+                      "ReadCapacityUnits": number,
+                      "WriteCapacityUnits": number
+                    }
+                  }],
+                  "ItemCount": number,
+                  "KeySchema": [{
+                    "AttributeName": "string",
+                    "KeyType": "string"
+                  }],
+                  "LatestStreamArn": "string",
+                  "LatestStreamLabel": "string",
+                  "LocalSecondaryIndexes": [{
+                    "IndexArn": "string",
+                    "IndexName": "string",
+                    "IndexSizeBytes": number,
+                    "ItemCount": number,
+                    "KeySchema": [{
+                      "AttributeName": "string",
+                      "KeyType": "string"
+                    }],
+                    "Projection": {
+                      "NonKeyAttributes": [
+                        "string"
+                      ],
+                      "ProjectionType": "string"
+                    }
+                  }],
+                  "ProvisionedThroughput": {
+                    "LastDecreaseDateTime": number,
+                    "LastIncreaseDateTime": number,
+                    "NumberOfDecreasesToday": number,
+                    "ReadCapacityUnits": number,
+                    "WriteCapacityUnits": number
+                  },
+                  "StreamSpecification": {
+                    "StreamEnabled": boolean,
+                    "StreamViewType": "string"
+                  },
+                  "TableArn": "string",
+                  "TableName": "string",
+                  "TableSizeBytes": number,
+                  "TableStatus": "string"
+                }
 
         """
         payload = {
