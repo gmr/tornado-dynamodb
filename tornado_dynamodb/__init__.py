@@ -287,17 +287,20 @@ class DynamoDB(client.AsyncAWSClient):
             Item-request-ConditionExpression>`_ for more information.
         :param dict expression_attribute_names: One or more substitution tokens
             for attribute names in an expression. See the `AWS documentation
-            for ExpressionAttributeNames <DDB-DeleteItem-request-Expression
-            AttributeNames>`_ for more information.
+            for ExpressionAttributeNames <http://docs.aws.amazon.com/
+            amazondynamodb/latest/APIReference/API_DeleteItem.html#DDB-Delete
+            Item-request-ExpressionAttributeNames>`_ for more information.
         :param dict expression_attribute_values: One or more values that can be
             substituted in an expression. See the `AWS documentation
-            for ExpressionAttributeValues <DDB-DeleteItem-request-Expression
-            AttributeValues>`_ for more information.
+            for ExpressionAttributeValues <http://docs.aws.amazon.com/
+            amazondynamodb/latest/APIReference/API_DeleteItem.html#DDB-Delete
+            Item-request-ExpressionAttributeValues>`_ for more information.
         :param str return_consumed_capacity: Determines the level of detail
             about provisioned throughput consumption that is returned in the
             response. See the `AWS documentation
-            for ReturnConsumedCapacity <DDB-DeleteItem-request-ReturnConsumed
-            Capacity>`_ for more information.
+            for ReturnConsumedCapacity <http://docs.aws.amazon.com/
+            amazondynamodb/latest/APIReference/API_DeleteItem.html#DDB-Delete
+            Item-request-ReturnConsumedCapacity>`_ for more information.
         :param bool return_item_collection_metrics: Determines whether item
             collection metrics are returned.
         :param bool return_values: Return the item attributes as they appeared
@@ -714,7 +717,28 @@ class DynamoDB(client.AsyncAWSClient):
                  :py:exc:`~tornado_dynamodb.exceptions.ProvisionedThroughputExceeded`
 
         """
-        pass
+        payload = {'TableName': table_name,
+                   'Key': utils.marshall(key),
+                   'ConsistentRead': consistent_read}
+        if expression_attribute_names:
+            payload['ExpressionAttributeNames'] = expression_attribute_names
+        if projection_expression:
+            payload['ProjectionExpression'] = projection_expression
+        if return_consumed_capacity:
+            payload['ReturnConsumedCapacity'] = return_consumed_capacity
+
+        future = concurrent.TracebackFuture()
+
+        def on_response(response):
+            try:
+                body = self._process_response(response)
+                body['Item'] = utils.unmarshall(body['Item'])
+                future.set_result(body)
+            except exceptions.DynamoDBException as error:
+                future.set_exception(error)
+
+        self.ioloop.add_future(self._fetch('GetItem', payload), on_response)
+        return future
 
     def list_tables(self, exclusive_start_table_name=None, limit=None):
         """Returns an array of table names associated with the current account
@@ -784,7 +808,7 @@ class DynamoDB(client.AsyncAWSClient):
         required attributes. Attribute values cannot be null. String and Binary
         type attributes must have lengths greater than zero. Set type
         attributes cannot be empty. Requests with empty values will be rejected
-        with a ValidationException exception.
+        with a :exc:`~tornado_dynamodb.exceptions.ValidationException`.
 
         You can request that PutItem return either a copy of the original item
         (before the update) or a copy of the updated item (after the update).
@@ -817,15 +841,20 @@ class DynamoDB(client.AsyncAWSClient):
             attributes as they appeared before they were updated with the
             *PutItem* request.
         :param str condition_expression: A condition that must be satisfied in
-            order for a conditional *PutItem* operation to succeed. One of:
-            ``attribute_exists``, ``attribute_not_exists``, ``attribute_type``,
-            ``contains``, ``begins_with``, ``size``, ``=``, ``<>``, ``<``,
-            ``>``, ``<=``, ``>=``, ``BETWEEN``, ``IN``, ``AND``, ``OR``, or
-            ``NOT``.
+            order for a conditional *PutItem* operation to succeed. See the
+            `AWS documentation for ConditionExpression <http://docs.aws.amazon.
+            com/amazondynamodb/latest/APIReference/API_PutItem.html#DDB-Put
+            Item-request-ConditionExpression>`_ for more information.
         :param dict expression_attribute_names: One or more substitution tokens
-            for attribute names in an expression.
+            for attribute names in an expression. See the `AWS documentation
+            for ExpressionAttributeNames <http://docs.aws.amazon.com/amazon
+            dynamodb/latest/APIReference/API_PutItem.html#DDB-PutItem-request-
+            ExpressionAttributeNames>`_ for more information.
         :param dict expression_attribute_values: One or more values that can be
-            substituted in an expression.
+            substituted in an expression. See the `AWS documentation
+            for ExpressionAttributeValues <http://docs.aws.amazon.com/amazon
+            dynamodb/latest/APIReference/API_PutItem.html#DDB-PutItem-request-
+            ExpressionAttributeValues>`_ for more information.
         :param str return_consumed_capacity: Determines the level of detail
             about provisioned throughput consumption that is returned in the
             response. Should be ``None`` or one of ``INDEXES`` or ``TOTAL``
@@ -834,7 +863,30 @@ class DynamoDB(client.AsyncAWSClient):
         :rtype: dict
 
         """
-        pass
+        payload = {'TableName': table_name, 'Item': utils.marshall(item)}
+        if condition_expression:
+            payload['ConditionExpression'] = condition_expression
+        if expression_attribute_names:
+            payload['ExpressionAttributeNames'] = expression_attribute_names
+        if expression_attribute_values:
+            payload['ExpressionAttributeValues'] = expression_attribute_values
+        if return_consumed_capacity:
+            payload['ReturnConsumedCapacity'] = return_consumed_capacity
+        if return_item_collection_metrics:
+            payload['ReturnItemCollectionMetrics'] = 'SIZE'
+        if return_values:
+            payload['ReturnValues'] = 'ALL_OLD'
+
+        future = concurrent.TracebackFuture()
+
+        def on_response(response):
+            try:
+                future.set_result(self._process_response(response))
+            except exceptions.DynamoDBException as error:
+                future.set_exception(error)
+
+        self.ioloop.add_future(self._fetch('PutItem', payload), on_response)
+        return future
 
     def query(self, table_name, consistent_read=False,
               exclusive_start_key=None, expression_attribute_names=None,

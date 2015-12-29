@@ -1,3 +1,4 @@
+import datetime
 import os
 import uuid
 
@@ -235,5 +236,26 @@ class ListTableTests(AsyncTestCase):
         self.assertTrue(response)
 
         # Describe the table
-        response = yield self.client.list_tables(limit=50)
+        response = yield self.client.list_tables(limit=100)
         self.assertIn(table, response['TableNames'])
+
+
+class PutGetDeleteTests(AsyncTestCase):
+
+    @testing.gen_test
+    def test_put_item(self):
+        # Create the table first
+        table = str(uuid.uuid4())
+        attrs = [{'AttributeName': 'id', 'AttributeType': 'S'}]
+        schema = [{'AttributeName': 'id', 'KeyType': 'HASH'}]
+        response = yield self.client.create_table(table, attrs, schema)
+        self.assertTrue(response)
+
+        row_id = uuid.uuid4()
+
+        # Describe the table
+        yield self.client.put_item(
+            table, {'id': row_id, 'created_at': datetime.datetime.utcnow()})
+
+        response = yield self.client.get_item(table, {'id': row_id})
+        self.assertEqual(response['Item']['id'], row_id)
