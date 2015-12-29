@@ -16,6 +16,11 @@ class DynamoDBException(Exception):
         super(DynamoDBException, self).__init__(*args, **kwargs)
 
 
+class ConditionalCheckFailedException(DynamoDBException):
+    """A condition specified in the operation could not be evaluated."""
+    pass
+
+
 class ConfigNotFound(DynamoDBException):
     """The configuration file could not be parsed."""
     pass
@@ -60,6 +65,14 @@ class InvalidQueryParameter(DynamoDBException):
     pass
 
 
+class ItemCollectionSizeLimitExceeded(DynamoDBException):
+    """An item collection is too large. This exception is only returned for
+    tables that have one or more local secondary indexes.
+
+    """
+    pass
+
+
 class LimitExceeded(DynamoDBException):
     """The number of concurrent table requests (cumulative number of tables in
     the ``CREATING``, ``DELETING`` or ``UPDATING`` state) exceeds the maximum
@@ -97,6 +110,19 @@ class NoProfileError(DynamoDBException):
 
 class OptInRequired(DynamoDBException):
     """The AWS access key ID needs a subscription for the service."""
+    pass
+
+
+class ProvisionedThroughputExceeded(DynamoDBException):
+    """Your request rate is too high. The AWS SDKs for DynamoDB automatically
+    retry requests that receive this exception. Your request is eventually
+    successful, unless your retry queue is too large to finish. Reduce the
+    frequency of requests and use exponential backoff. For more information, go
+    to `Error Retries and Exponential Backoff <http://docs.aws.amazon.com/
+    amazondynamodb/latest/developerguide/ErrorHandling.html#APIRetries>`_ in
+    the Amazon DynamoDB Developer Guide.
+
+    """
     pass
 
 
