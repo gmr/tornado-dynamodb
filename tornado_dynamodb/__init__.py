@@ -304,12 +304,11 @@ class DynamoDB(client.AsyncAWSClient):
             response:
               - ``INDEXES``: The response includes the aggregate consumed
                 capacity for the operation, together with consumed capacity for
-                each table and secondary index that was accessed.
-
-                Note that some operations, such as *GetItem* and
-                *BatchGetItem*, do not access any indexes at all. In these
-                cases, specifying ``INDEXES`` will only return
-                consumed capacity information for table(s).
+                each table and secondary index that was accessed. Note that
+                some operations, such as *GetItem* and *BatchGetItem*, do not
+                access any indexes at all. In these cases, specifying
+                ``INDEXES`` will only return consumed capacity information for
+                table(s).
               - ``TOTAL``: The response includes only the aggregate consumed
                 capacity for the operation.
               - ``NONE``: No consumed capacity details are included in the
@@ -442,17 +441,15 @@ class DynamoDB(client.AsyncAWSClient):
             items.
         :param bool consistent_read: Determines the read consistency model: If
             set to ``True``, then the operation uses strongly consistent reads;
-            otherwise, the operation uses eventually consistent reads.
-
-            Strongly consistent reads are not supported on global secondary
-            indexes. If you query a global secondary index with
-            ``consistent_read`` set to ``True``, you will receive a
+            otherwise, the operation uses eventually consistent reads. Strongly
+            consistent reads are not supported on global secondary indexes. If
+            you query a global secondary index with ``consistent_read`` set to
+            ``True``, you will receive a
             :exc:`~tornado_dynamodb.exceptions.ValidationException`.
         :param str|bytes|int exclusive_start_key: The primary key of the first
             item that this operation will evaluate. Use the value that was
-            returned for ``LastEvaluatedKey`` in the previous operation.
-
-            In a parallel scan, a *Scan* request that includes
+            returned for ``LastEvaluatedKey`` in the previous operation. In a
+            parallel scan, a *Scan* request that includes
             ``exclusive_start_key`` must specify the same segment whose
             previous *Scan* returned the corresponding value of
             ``LastEvaluatedKey``.
@@ -463,15 +460,12 @@ class DynamoDB(client.AsyncAWSClient):
         :param str filter_expression: A string that contains conditions that
             DynamoDB applies after the *Query* operation, but before the data
             is returned to you. Items that do not satisfy the criteria are not
-            returned.
-
-            .. note:: A filter expression is applied after the items have
-                already been read; the process of filtering does not consume any
-                additional read capacity units.
-
-            For more information, see `Filter Expressions <http://docs.aws.
-            amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#
-            FilteringResults>`_ in the Amazon DynamoDB Developer Guide.
+            returned. Note that a filter expression is applied after the items
+            have already been read; the process of filtering does not consume
+            any additional read capacity units. For more information, see
+            `Filter Expressions <http://docs.aws.amazon.com/amazondynamodb/
+            latest/developerguide/QueryAndScan.html#FilteringResults>`_ in the
+            Amazon DynamoDB Developer Guide.
         :param str projection_expression:
         :param str index_name: The name of a secondary index to query. This
             index can be any local secondary index or global secondary index.
@@ -494,52 +488,49 @@ class DynamoDB(client.AsyncAWSClient):
             about provisioned throughput consumption that is returned in the
             response:
 
-            - ``INDEXES``: The response includes the aggregate
-              consumed capacity for the operation, together with
-              consumed capacity for each table and secondary index that was
-              accessed.
-
-              Note that some operations, such as *GetItem* and *BatchGetItem*,
-              do not access any indexes at all. In these cases, specifying
-              ``INDEXES`` will only return consumed capacity information for
-              table(s).
-            - ``TOTAL``: The response includes only the aggregate
-              consumed capacity for the operation.
-            - ``NONE``: No consumed capacity details are included in the
-              response.
+              - ``INDEXES``: The response includes the aggregate consumed
+                capacity for the operation, together with consumed capacity for
+                each table and secondary index that was accessed. Note that
+                some operations, such as *GetItem* and *BatchGetItem*, do not
+                access any indexes at all. In these cases, specifying
+                ``INDEXES`` will only return consumed capacity information for
+                table(s).
+              - ``TOTAL``: The response includes only the aggregate consumed
+                capacity for the operation.
+              - ``NONE``: No consumed capacity details are included in the
+                response.
         :param bool scan_index_forward: Specifies the order for index
             traversal: If ``True`` (default), the traversal is performed in
             ascending order; if ``False``, the traversal is performed in
-            descending order.
-
-            Items with the same partition key value are stored in sorted order
-            by sort key. If the sort key data type is *Number*, the results are
-            stored in numeric order. For type *String*, the results are stored
-            in order of ASCII character code values. For type *Binary*,
-            DynamoDB treats each byte of the binary data as unsigned.
-
-            If set to ``True``, DynamoDB returns the results in the order in
-            which they are stored (by sort key value). This is the default
-            behavior. If set to ``False``, DynamoDB reads the results in
-            reverse order by sort key value, and then returns the results to
-            the client.
+            descending order. Items with the same partition key value are
+            stored in sorted order by sort key. If the sort key data type is
+            *Number*, the results are stored in numeric order. For type
+            *String*, the results are stored in order of ASCII character code
+            values. For type *Binary*, DynamoDB treats each byte of the binary
+            data as unsigned. If set to ``True``, DynamoDB returns the results
+            in the order in which they are stored (by sort key value). This is
+            the default behavior. If set to ``False``, DynamoDB reads the
+            results in reverse order by sort key value, and then returns the
+            results to the client.
         :param str select: The attributes to be returned in the result. You can
             retrieve all item attributes, specific item attributes, the count
             of matching items, or in the case of an index, some or all of the
-            attributes projected into the index.
+            attributes projected into the index. Possible values are:
 
-            - ``ALL_ATTRIBUTES``: Returns all of the item attributes from the
-              specified table or index. If you query a local secondary index,
-              then for each matching item in the index DynamoDB will fetch the
-              entire item from the parent table. If the index is configured to
-              project all item attributes, then all of the data can be obtained
-              from the local secondary index, and no fetching is required.
-            - ``ALL_PROJECTED_ATTRIBUTES``: Allowed only when querying an
-              index. Retrieves all attributes that have been projected into the
-              index. If the index is configured to project all attributes, this
-              return value is equivalent to specifying ``ALL_ATTRIBUTES``.
-            - ``COUNT``: Returns the number of matching items, rather than the
-              matching items themselves.
+              - ``ALL_ATTRIBUTES``: Returns all of the item attributes from the
+                specified table or index. If you query a local secondary index,
+                then for each matching item in the index DynamoDB will fetch
+                the entire item from the parent table. If the index is
+                configured to project all item attributes, then all of the data
+                can be obtained from the local secondary index, and no fetching
+                is required.
+              - ``ALL_PROJECTED_ATTRIBUTES``: Allowed only when querying an
+                index. Retrieves all attributes that have been projected into
+                the index. If the index is configured to project all
+                attributes, this return value is equivalent to specifying
+                ``ALL_ATTRIBUTES``.
+              - ``COUNT``: Returns the number of matching items, rather than
+                the matching items themselves.
         :rtype: dict
 
         """
