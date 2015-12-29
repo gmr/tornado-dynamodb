@@ -1,6 +1,10 @@
 """
-DynamoDB Tornado Client
-=======================
+DynamoDB Client
+===============
+:py:class:`~tornado_dynamodb.DynamoDB` is an opinionated DynamoDB client for
+`Tornado <http://www.tornadoweb.org>`_. While it follows the DynamoDB API
+fairly closely, it does try and make some of the more mundane tasks like
+data marshalling and demarshalling for you.
 
 """
 import json
@@ -261,30 +265,109 @@ class DynamoDB(client.AsyncAWSClient):
         :param str table_name: The name of the table from which to delete the
             item.
         :param dict key: A map of attribute names to ``AttributeValue``
-            objects, representing the primary key of the item to delete.
-
-            For the primary key, you must provide all of the attributes. For
+            objects, representing the primary key of the item to delete. For
+            the primary key, you must provide all of the attributes. For
             example, with a simple primary key, you only need to provide a
             value for the partition key. For a composite primary key, you must
             provide values for both the partition key and the sort key.
         :param str condition_expression: A condition that must be satisfied in
-            order for a conditional *DeleteItem* to succeed. One of:
-            ``attribute_exists``, ``attribute_not_exists``, ``attribute_type``,
-            ``contains``, ``begins_with``, ``size``, ``=``, ``<>``, ``<``,
-            ``>``, ``<=``, ``>=``, ``BETWEEN``, ``IN``, ``AND``, ``OR``, or
-            ``NOT``.
+            order for a conditional *DeleteItem* to succeed. See the `AWS
+            documentation for ConditionExpression <http://docs.aws.amazon.com/
+            amazondynamodb/latest/APIReference/API_DeleteItem.html#DDB-Delete
+            Item-request-ConditionExpression>`_ for more information.
         :param dict expression_attribute_names: One or more substitution tokens
-            for attribute names in an expression.
+            for attribute names in an expression. See the `AWS documentation
+            for ExpressionAttributeNames <DDB-DeleteItem-request-Expression
+            AttributeNames>`_ for more information.
         :param dict expression_attribute_values: One or more values that can be
-            substituted in an expression.
+            substituted in an expression. See the `AWS documentation
+            for ExpressionAttributeValues <DDB-DeleteItem-request-Expression
+            AttributeValues>`_ for more information.
         :param str return_consumed_capacity: Determines the level of detail
             about provisioned throughput consumption that is returned in the
-            response. Should be ``None`` or one of ``INDEXES`` or ``TOTAL``
+            response. See the `AWS documentation
+            for ReturnConsumedCapacity <DDB-DeleteItem-request-ReturnConsumed
+            Capacity>`_ for more information.
         :param bool return_item_collection_metrics: Determines whether item
             collection metrics are returned.
         :param bool return_values: Return the item attributes as they appeared
             before they were deleted.
-        :rtype:
+        :returns dict: Response format:
+
+            .. code:: json
+
+                {
+                  "Attributes": {
+                    "string": {
+                      "B": blob,
+                      "BOOL": boolean,
+                      "BS": [
+                        blob
+                      ],
+                      "L": [
+                        AttributeValue
+                      ],
+                      "M": {
+                        "string": AttributeValue
+                      },
+                      "N": "string",
+                      "NS": [
+                        "string"
+                      ],
+                      "NULL": boolean,
+                      "S": "string",
+                      "SS": [
+                        "string"
+                      ]
+                    }
+                  },
+                  "ConsumedCapacity": {
+                    "CapacityUnits": number,
+                    "GlobalSecondaryIndexes": {
+                      "string": {
+                        "CapacityUnits": number
+                      }
+                    },
+                    "LocalSecondaryIndexes": {
+                      "string": {
+                        "CapacityUnits": number
+                      }
+                    },
+                    "Table": {
+                      "CapacityUnits": number
+                    },
+                    "TableName": "string"
+                  },
+                  "ItemCollectionMetrics": {
+                    "ItemCollectionKey": {
+                      "string": {
+                        "B": blob,
+                        "BOOL": boolean,
+                        "BS": [
+                          blob
+                        ],
+                        "L": [
+                          AttributeValue
+                        ],
+                        "M": {
+                          "string": AttributeValue
+                        },
+                        "N": "string",
+                        "NS": [
+                          "string"
+                        ],
+                        "NULL": boolean,
+                        "S": "string",
+                        "SS": [
+                          "string"
+                        ]
+                      }
+                    },
+                    "SizeEstimateRangeGB": [
+                      number
+                    ]
+                  }
+                }
 
         """
         pass
