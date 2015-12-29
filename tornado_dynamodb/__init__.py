@@ -727,10 +727,41 @@ class DynamoDB(client.AsyncAWSClient):
             obtain the next page of results.
         :param int limit: A maximum number of table names to return. If this
             parameter is not specified, the limit is ``100``.
-        :rtype: dict
+        :returns: Response Format:
+
+            .. code:: json
+
+                {
+                  "LastEvaluatedTableName": "string",
+                  "TableNames": [
+                    "string"
+                  ]
+                }
+
+        :raises: :py:exc:`~tornado_dynamodb.exceptions.InternalFailure`
+                 :py:exc:`~tornado_dynamodb.exceptions.MissingParameter`
+                 :py:exc:`~tornado_dynamodb.exceptions.OptInRequired`
+                 :py:exc:`~tornado_dynamodb.exceptions.RequestExpired`
+                 :py:exc:`~tornado_dynamodb.exceptions.ServiceUnavailable`
+                 :py:exc:`~tornado_dynamodb.exceptions.ThrottlingException`
+                 :py:exc:`~tornado_dynamodb.exceptions.ValidationException`
 
         """
-        pass
+        future = concurrent.TracebackFuture()
+        payload = {}
+        if exclusive_start_table_name:
+            payload['ExclusiveStartTableName'] = exclusive_start_table_name
+        if limit:
+            payload['Limit'] = limit
+
+        def on_response(response):
+            try:
+                future.set_result(self._process_response(response))
+            except exceptions.DynamoDBException as error:
+                future.set_exception(error)
+        request = self._fetch('ListTables', payload)
+        self.ioloop.add_future(request, on_response)
+        return future
 
     def put_item(self, table_name, item, return_values=False,
                  condition_expression=None,

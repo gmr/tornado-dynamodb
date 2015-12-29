@@ -221,3 +221,19 @@ class DescribeTableTests(AsyncTestCase):
         table = str(uuid.uuid4())
         with self.assertRaises(exceptions.ResourceNotFound):
             yield self.client.describe_table(table)
+
+
+class ListTableTests(AsyncTestCase):
+
+    @testing.gen_test
+    def test_list_tables(self):
+        # Create the table first
+        table = str(uuid.uuid4())
+        attrs = [{'AttributeName': 'id', 'AttributeType': 'S'}]
+        schema = [{'AttributeName': 'id', 'KeyType': 'HASH'}]
+        response = yield self.client.create_table(table, attrs, schema)
+        self.assertTrue(response)
+
+        # Describe the table
+        response = yield self.client.list_tables(limit=50)
+        self.assertIn(table, response['TableNames'])
