@@ -7,9 +7,10 @@ import json
 import logging
 
 from tornado_aws import client
-
+from tornado_aws import exceptions as aws_exceptions
 
 from tornado import concurrent
+from tornado import httpclient
 from tornado import ioloop
 
 from tornado_dynamodb import exceptions
@@ -122,16 +123,12 @@ class DynamoDB(client.AsyncAWSClient):
 
         def on_response(response):
             try:
-                body = self._process_response(response)
+                future.set_result(
+                    self._process_response(response)['TableDescription'])
             except exceptions.DynamoDBException as error:
                 return future.set_exception(error)
-            if self._table_status(body) == TABLE_ACTIVE:
-                return future.set_result(True)
-            self.ioloop.add_future(self.describe_table(name), on_response)
 
-        request = self.fetch('POST', '/',
-                             headers=self._headers('CreateTable'),
-                             body=json.dumps(payload))
+        request = self._fetch('CreateTable', payload)
         self.ioloop.add_future(request, on_response)
         return future
 
@@ -154,13 +151,12 @@ class DynamoDB(client.AsyncAWSClient):
 
         def on_response(response):
             try:
-                future.set_result(self._process_response(response))
+                future.set_result(
+                    self._process_response(response).get('TableDescription'))
             except exceptions.DynamoDBException as error:
                 future.set_exception(error)
 
-        request = self.fetch('POST', '/',
-                             headers=self._headers('DeleteTable'),
-                             body=json.dumps({'TableName': name}))
+        request = self._fetch('DeleteTable', {'TableName': name})
         self.ioloop.add_future(request, on_response)
         return future
 
@@ -181,10 +177,34 @@ class DynamoDB(client.AsyncAWSClient):
             except exceptions.DynamoDBException as error:
                 future.set_exception(error)
 
-        request = self.fetch('POST', '/',
-                             headers=self._headers('DescribeTable'),
-                             body=json.dumps({'TableName': name}))
+        request = self._fetch('DescribeTable', {'TableName': name})
         self.ioloop.add_future(request, on_response)
+        return future
+
+    def _fetch(self, command, body):
+        """
+
+        :param str command:
+        :param dict body:
+        :rtype: :class:`tornado.concurrent.Future`
+
+        """
+        try:
+            future = self.fetch('POST', '/', headers=self._headers(command),
+                                body=json.dumps(body))
+        except aws_exceptions.ConfigNotFound as error:
+            raise exceptions.ConfigNotFound(str(error))
+        except aws_exceptions.ConfigParserError as error:
+            raise exceptions.ConfigParserError(str(error))
+        except aws_exceptions.NoCredentialsError as error:
+            raise exceptions.NoCredentialsError(str(error))
+        except aws_exceptions.NoProfileError as error:
+            raise exceptions.NoProfileError(str(error))
+        except httpclient.HTTPError as error:
+            if error.code == 599:
+                raise exceptions.TimeoutException()
+            else:
+                raise exceptions.RequestException(error.message)
         return future
 
     @staticmethod
@@ -193,7 +213,7 @@ class DynamoDB(client.AsyncAWSClient):
         if error:
             raise error
         http_response = response.result()
-        if not http_response:
+        if not http_response or not http_response.body:
             raise exceptions.DynamoDBException('empty response')
         body = json.loads(http_response.body.decode('utf-8'))
         if http_response.code != 200:
@@ -201,22 +221,6 @@ class DynamoDB(client.AsyncAWSClient):
                 raise exceptions.MAP[body['__type']](body['message'])
             raise ValueError('Unhandled exception!', body)
         return body
-
-    @staticmethod
-    def _table_status(value):
-        """Extract the table status out of the response of CreateTable and
-        Describe table with a single method.
-
-        :param dict value: The response value
-        :rtype: str
-        :raises: ValueError
-
-        """
-        if 'TableStatus' in value:
-            return value['TableStatus']
-        elif 'TableDescription' in value:
-            return value['TableDescription'].get('TableStatus')
-        raise ValueError('Unsupported response structure')
 
     @staticmethod
     def _headers(method):

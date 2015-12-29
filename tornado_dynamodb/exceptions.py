@@ -9,27 +9,24 @@ class DynamoDBException(Exception):
     """Base exception that is extended by all exceptions raised by
     tornado_dynamodb.
 
+    :ivar msg: The error message
+
     """
-    pass
+    def __init__(self, *args, **kwargs):
+        super(DynamoDBException, self).__init__(*args, **kwargs)
 
 
 class ConfigNotFound(DynamoDBException):
-    """The configuration file could not be parsed.
-
-    :ivar str path: The path to the config file
-
-    """
-    fmt = 'The config file could not be found ({path})'
+    """The configuration file could not be parsed."""
+    pass
 
 
 class ConfigParserError(DynamoDBException):
     """Error raised when parsing a configuration file with
     :class:`~configparser.RawConfigParser`
 
-    :ivar str path: The path to the config file
-
     """
-    fmt = 'Unable to parse config file ({path})'
+    pass
 
 
 class InternalFailure(DynamoDBException):
@@ -90,21 +87,24 @@ class MissingParameter(DynamoDBException):
 
 class NoCredentialsError(DynamoDBException):
     """Raised when the credentials could not be located."""
-    fmt = 'Credentials not found'
+    pass
 
 
 class NoProfileError(DynamoDBException):
-    """Raised when the specified profile could not be located.
-
-    :ivar str path: The path to the config file
-    :ivar str profile: The profile that was specified
-
-    """
-    fmt = 'Profile ({profile}) not found ({path})'
+    """Raised when the specified profile could not be located."""
+    pass
 
 
 class OptInRequired(DynamoDBException):
     """The AWS access key ID needs a subscription for the service."""
+    pass
+
+
+class RequestException(DynamoDBException):
+    """A generic HTTP request exception has occurred when communicating with
+    DynamoDB.
+
+    """
     pass
 
 
@@ -142,6 +142,11 @@ class ServiceUnavailable(DynamoDBException):
 
 class ThrottlingException(DynamoDBException):
     """The request was denied due to request throttling."""
+    pass
+
+
+class TimeoutException(DynamoDBException):
+    """The request to DynamoDB timed out."""
     pass
 
 
