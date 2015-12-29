@@ -124,6 +124,7 @@ class DynamoDB(client.AsyncAWSClient):
             ``stream_view_type`` determines what information is written to the
             stream for this table.
         :rtype: dict
+
             .. code:: json
 
                 {
