@@ -123,7 +123,7 @@ class DynamoDB(client.AsyncAWSClient):
         :param str stream_view_type: When an item in the table is modified,
             ``stream_view_type`` determines what information is written to the
             stream for this table.
-        :rtype: dict
+        :returns dict: Response format:
 
             .. code:: json
 
