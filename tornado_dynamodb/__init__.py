@@ -127,7 +127,7 @@ class DynamoDB(client.AsyncAWSClient):
         :param str stream_view_type: When an item in the table is modified,
             ``stream_view_type`` determines what information is written to the
             stream for this table.
-        :returns dict: Response format:
+        :returns: Response format:
 
             .. code:: json
 
@@ -201,6 +201,17 @@ class DynamoDB(client.AsyncAWSClient):
                   "TableSizeBytes": number,
                   "TableStatus": "string"
                 }
+
+        :raises: :py:exc:`~tornado_dynamodb.exceptions.InternalServerError`
+                 :py:exc:`~tornado_dynamodb.exceptions.InternalFailure`
+                 :py:exc:`~tornado_dynamodb.exceptions.LimitExceeded`
+                 :py:exc:`~tornado_dynamodb.exceptions.MissingParameter`
+                 :py:exc:`~tornado_dynamodb.exceptions.OptInRequired`
+                 :py:exc:`~tornado_dynamodb.exceptions.ResourceInUse`
+                 :py:exc:`~tornado_dynamodb.exceptions.RequestExpired`
+                 :py:exc:`~tornado_dynamodb.exceptions.ServiceUnavailable`
+                 :py:exc:`~tornado_dynamodb.exceptions.Throttling`
+                 :py:exc:`~tornado_dynamodb.exceptions.ValidationError`
 
         """
         payload = {
@@ -292,7 +303,7 @@ class DynamoDB(client.AsyncAWSClient):
             collection metrics are returned.
         :param bool return_values: Return the item attributes as they appeared
             before they were deleted.
-        :returns dict: Response format:
+        :returns: Response format:
 
             .. code:: json
 
@@ -374,17 +385,90 @@ class DynamoDB(client.AsyncAWSClient):
 
     def delete_table(self, name):
         """The DeleteTable operation deletes a table and all of its items.
-        After a DeleteTable request, the specified table is in the ``DELETING``
+        After a DeleteTable request, the specified table is in the DELETING
         state until DynamoDB completes the deletion. If the table is in the
-        ``ACTIVE`` state, you can delete it. If a table is in ``CREATING`` or
-        ``UPDATING`` states, then DynamoDB returns a
-        :exc:`~tornado_dynamodb.exceptions.ResourceInUse`. If the
-        specified table does not exist, DynamoDB returns a
+        ACTIVE state, you can delete it. If a table is in CREATING or UPDATING
+        states, then DynamoDB returns a
+        :py:exc:`~tornado_dynamodb.exceptions.ResourceInUse`. If the specified
+        table does not exist, DynamoDB returns a
         :exc:`~tornado_dynamodb.exceptions.ResourceNotFound` . If table is
-        already in the ``DELETING`` state, no error is returned.
+        already in the DELETING state, no error is returned.
 
         :param str name: The table name
-        :rtype: dict
+        :returns: Response Format:
+
+            .. code:: json
+
+                {
+                  "AttributeDefinitions": [{
+                    "AttributeName": "string",
+                    "AttributeType": "string"
+                  }],
+                  "CreationDateTime": number,
+                  "GlobalSecondaryIndexes": [{
+                    "Backfilling": boolean,
+                    "IndexArn": "string",
+                    "IndexName": "string",
+                    "IndexSizeBytes": number,
+                    "IndexStatus": "string",
+                    "ItemCount": number,
+                    "KeySchema": [{
+                      "AttributeName": "string",
+                      "KeyType": "string"
+                    }],
+                    "Projection": {
+                      "NonKeyAttributes": [
+                        "string"
+                      ],
+                      "ProjectionType": "string"
+                    },
+                    "ProvisionedThroughput": {
+                      "LastDecreaseDateTime": number,
+                      "LastIncreaseDateTime": number,
+                      "NumberOfDecreasesToday": number,
+                      "ReadCapacityUnits": number,
+                      "WriteCapacityUnits": number
+                    }
+                  }],
+                  "ItemCount": number,
+                  "KeySchema": [{
+                    "AttributeName": "string",
+                    "KeyType": "string"
+                  }],
+                  "LatestStreamArn": "string",
+                  "LatestStreamLabel": "string",
+                  "LocalSecondaryIndexes": [{
+                    "IndexArn": "string",
+                    "IndexName": "string",
+                    "IndexSizeBytes": number,
+                    "ItemCount": number,
+                    "KeySchema": [{
+                      "AttributeName": "string",
+                      "KeyType": "string"
+                    }],
+                    "Projection": {
+                      "NonKeyAttributes": [
+                        "string"
+                      ],
+                      "ProjectionType": "string"
+                    }
+                  }],
+                  "ProvisionedThroughput": {
+                    "LastDecreaseDateTime": number,
+                    "LastIncreaseDateTime": number,
+                    "NumberOfDecreasesToday": number,
+                    "ReadCapacityUnits": number,
+                    "WriteCapacityUnits": number
+                  },
+                  "StreamSpecification": {
+                    "StreamEnabled": boolean,
+                    "StreamViewType": "string"
+                  },
+                  "TableArn": "string",
+                  "TableName": "string",
+                  "TableSizeBytes": number,
+                  "TableStatus": "string"
+                }
 
         """
         future = concurrent.TracebackFuture()
