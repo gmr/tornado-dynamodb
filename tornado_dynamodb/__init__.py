@@ -46,10 +46,10 @@ class DynamoDB(client.AsyncAWSClient):
     :param str endpoint: Override the base endpoint URL
     :param int max_clients: Max simultaneous requests (Default: ``100``)
 
-    :raises: :exc:`~tornado_dynamodb.exceptions.ConfigNotFound`
-    :raises: :exc:`~tornado_dynamodb.exceptions.ConfigParserError`
-    :raises: :exc:`~tornado_dynamodb.exceptions.NoCredentialsError`
-    :raises: :exc:`~tornado_dynamodb.exceptions.NoProfileError`
+    :raises: :py:exc:`~tornado_dynamodb.exceptions.ConfigNotFound`
+             :py:exc:`~tornado_dynamodb.exceptions.ConfigParserError`
+             :py:exc:`~tornado_dynamodb.exceptions.NoCredentialsError`
+             :py:exc:`~tornado_dynamodb.exceptions.NoProfileError`
 
     """
     def __init__(self, profile=None, region=None, access_key=None,
