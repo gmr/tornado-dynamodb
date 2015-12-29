@@ -302,19 +302,17 @@ class DynamoDB(client.AsyncAWSClient):
         :param str return_consumed_capacity: Determines the level of detail
             about provisioned throughput consumption that is returned in the
             response:
-
-              - ``INDEXES``: The response includes the aggregate
-                ``ConsumedCapacity`` for the operation, together with
-                ``ConsumedCapacity`` for each table and secondary index that
-                was accessed.
+              - ``INDEXES``: The response includes the aggregate consumed
+                capacity for the operation, together with consumed capacity for
+                each table and secondary index that was accessed.
 
                 Note that some operations, such as *GetItem* and
                 *BatchGetItem*, do not access any indexes at all. In these
                 cases, specifying ``INDEXES`` will only return
-                ``ConsumedCapacity`` information for table(s).
-              - ``TOTAL``: The response includes only the aggregate
-                ``ConsumedCapacity`` for the operation.
-              - ``NONE``: No ``ConsumedCapacity`` details are included in the
+                consumed capacity information for table(s).
+              - ``TOTAL``: The response includes only the aggregate consumed
+                capacity for the operation.
+              - ``NONE``: No consumed capacity details are included in the
                 response.
         :rtype: dict
 
@@ -497,17 +495,17 @@ class DynamoDB(client.AsyncAWSClient):
             response:
 
             - ``INDEXES``: The response includes the aggregate
-              ``ConsumedCapacity`` for the operation, together with
-              ``ConsumedCapacity`` for each table and secondary index that was
+              consumed capacity for the operation, together with
+              consumed capacity for each table and secondary index that was
               accessed.
 
               Note that some operations, such as *GetItem* and *BatchGetItem*,
               do not access any indexes at all. In these cases, specifying
-              ``INDEXES`` will only return ``ConsumedCapacity`` information for
+              ``INDEXES`` will only return consumed capacity information for
               table(s).
             - ``TOTAL``: The response includes only the aggregate
-              ``ConsumedCapacity`` for the operation.
-            - ``NONE``: No ``ConsumedCapacity`` details are included in the
+              consumed capacity for the operation.
+            - ``NONE``: No consumed capacity details are included in the
               response.
         :param bool scan_index_forward: Specifies the order for index
             traversal: If ``True`` (default), the traversal is performed in
